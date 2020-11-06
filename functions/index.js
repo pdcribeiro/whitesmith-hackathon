@@ -1,6 +1,5 @@
 const admin = require('firebase-admin');
 const functions = require('firebase-functions');
-const { object } = require('firebase-functions/lib/providers/storage');
 
 admin.initializeApp();
 
@@ -17,10 +16,8 @@ exports.match = functions.https.onRequest(async (req, res) => {
     .where('interests', 'array-contains-any', skills)
     // .where('skills', 'array-contains-any', interests)  // only one array-contains-any condition is allowed per query
     .get()
-    .then(
-      querySnapshot =>
-        querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) // free tier limits to ECMAScript 2017
-      // querySnapshot.docs.map(doc => Object.assign(doc.data(), { id: doc.id }))
+    .then(querySnapshot =>
+      querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
     );
   console.dir(matches);
 
@@ -30,10 +27,13 @@ exports.match = functions.https.onRequest(async (req, res) => {
     .collection('skills')
     .get()
     .then(querySnapshot =>
-      querySnapshot.docs.reduce((skills, doc) => ({
-        ...skills,
-        [doc.id]: doc.data().name,
-      }), {})
+      querySnapshot.docs.reduce(
+        (skills, doc) => ({
+          ...skills,
+          [doc.id]: doc.data().name,
+        }),
+        {}
+      )
     );
   console.dir(skillMap);
 

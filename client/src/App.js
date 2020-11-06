@@ -1,19 +1,22 @@
 import { Router } from '@reach/router';
 import { useState } from 'react';
 
-import Profile from './pages/Profile';
+import './firebase.config';
+import Login from './pages/Login';
+import Register from './pages/Register';
 import Matches from './pages/Matches';
 
 function App() {
   const [user, setUser] = useState(null);
-  const [matches, setMatches] = useState([]);
+  console.dir(user);
 
   return (
     <>
-      {user && 'user: ' + user.username}
+      {user && <p>user: {user.id}</p>}
       <Router>
-        <Profile path="/" setUser={setUser} setMatches={setMatches} />
-        <Matches path="matches" matches={matches} />
+        <Login path="/" setUser={setUser} />
+        <Register path="register" setUser={setUser} />
+        <Matches path="matches" user={user} />
       </Router>
     </>
   );

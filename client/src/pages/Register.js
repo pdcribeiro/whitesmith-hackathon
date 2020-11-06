@@ -2,34 +2,18 @@ import { Formik, Form, Field, FieldArray, ErrorMessage } from 'formik';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-import { db, functions } from '../firebase';
+import { getSkills, register } from '../firebase';
 
-export default function Profile({ setUser, setMatches, navigate }) {
+export default function Register({ setUser, navigate }) {
   const [skills, setSkills] = useState([{ id: '', name: 'loading...' }]);
 
   useEffect(() => {
-    db.collection('skills')
-      .get()
-      .then(querySnapshot => [
-        { id: '', name: 'select skill' },
-        ...querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })),
-      ])
-      .then(setSkills);
+    getSkills().then(setSkills);
   }, []);
 
   async function handleSubmit(data) {
-    const userID = (await db.collection('users').add(data)).id;
-    setUser({ id: userID, ...data });
-
-    //TODO send id
-    // await functions.httpsCallable('match')(data).then(setMatches);
-    await fetch('http://localhost:5001/whitesmith-hackaton/us-central1/match', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    })
-      .then(response => response.json())
-      .then(setMatches);
-
+    const user = await register(data);
+    setUser(user);
     navigate('/matches');
   }
 
