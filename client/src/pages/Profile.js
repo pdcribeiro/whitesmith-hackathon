@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 import { db, functions } from '../firebase';
 
-export default function Profile({ setMatches, navigate }) {
+export default function Profile({ setUser, setMatches, navigate }) {
   const [skills, setSkills] = useState([{ id: '', name: 'loading...' }]);
 
   useEffect(() => {
@@ -18,11 +18,10 @@ export default function Profile({ setMatches, navigate }) {
   }, []);
 
   async function handleSubmit(data) {
-    console.dir('data', data);
-    
-    //TODO send id
-    await db.collection('users').add(data);
+    const userID = (await db.collection('users').add(data)).id;
+    setUser({ id: userID, ...data });
 
+    //TODO send id
     // await functions.httpsCallable('match')(data).then(setMatches);
     await fetch('http://localhost:5001/whitesmith-hackaton/us-central1/match', {
       method: 'POST',

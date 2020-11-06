@@ -5,13 +5,17 @@ import Profile from './pages/Profile';
 import Matches from './pages/Matches';
 
 function App() {
+  const [user, setUser] = useState(null);
   const [matches, setMatches] = useState([]);
 
   return (
-    <Router>
-      <Profile path="/" setMatches={setMatches} />
-      <Matches path="matches" matches={matches} />
-    </Router>
+    <>
+      {user && 'user: ' + user.username}
+      <Router>
+        <Profile path="/" setUser={setUser} setMatches={setMatches} />
+        <Matches path="matches" matches={matches} />
+      </Router>
+    </>
   );
 }
 
