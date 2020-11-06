@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 import { db, functions } from '../firebase';
 
-export default function Profile() {
+export default function Profile({ setMatches, navigate }) {
   const [skills, setSkills] = useState([{ id: '', name: 'loading...' }]);
 
   useEffect(() => {
@@ -17,6 +17,23 @@ export default function Profile() {
       .then(setSkills);
   }, []);
 
+  async function handleSubmit(data) {
+    console.dir('data', data);
+    
+    //TODO send id
+    await db.collection('users').add(data);
+
+    // await functions.httpsCallable('match')(data).then(setMatches);
+    await fetch('http://localhost:5001/whitesmith-hackaton/us-central1/match', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+      .then(response => response.json())
+      .then(setMatches);
+
+    navigate('/matches');
+  }
+
   return (
     <Formik
       initialValues={{
@@ -24,18 +41,7 @@ export default function Profile() {
         skills: [''],
         interests: [''],
       }}
-      onSubmit={async (values, { resetForm }) => {
-        console.dir('values', values);
-        //TODO send id
-        await db.collection('users').add(values);
-        // await functions.httpsCallable('match')(values).then(console.dir);
-        await fetch('http://localhost:5001/whitesmith-hackaton/us-central1/match', {
-          method: 'POST',
-          // mode: 'cors',
-          body: JSON.stringify(values),
-        }).then(response => response.json()).then(console.dir);
-        resetForm();
-      }}
+      onSubmit={handleSubmit}
     >
       {({ values, isSubmitting }) => (
         <StyledForm>
