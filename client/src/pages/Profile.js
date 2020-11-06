@@ -2,7 +2,7 @@ import { Formik, Form, Field, FieldArray, ErrorMessage } from 'formik';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-import { db } from '../firebase';
+import { db, functions } from '../firebase';
 
 export default function Profile() {
   const [skills, setSkills] = useState([{ id: '', name: 'loading...' }]);
@@ -26,7 +26,14 @@ export default function Profile() {
       }}
       onSubmit={async (values, { resetForm }) => {
         console.dir('values', values);
+        //TODO send id
         await db.collection('users').add(values);
+        // await functions.httpsCallable('match')(values).then(console.dir);
+        await fetch('http://localhost:5001/whitesmith-hackaton/us-central1/match', {
+          method: 'POST',
+          // mode: 'cors',
+          body: JSON.stringify(values),
+        }).then(response => response.json()).then(console.dir);
         resetForm();
       }}
     >
